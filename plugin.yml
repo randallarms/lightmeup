@@ -1,0 +1,13 @@
+name: LightMeUp
+main: com.kraken.lightmeup.Main
+version: 0.1 (alpha)
+commands: 
+     light:
+        description: Lights up the ground you walk on.
+        usage: /<command>
+     opReqLMU:
+        description: Enable/disable requirement of OP perms to use LMU commands.
+        usage: /<command> <on/off>
+     lmu:
+        description: Info on the LightMeUp plugin & version number.
+        usage: /<command>
