@@ -1,6 +1,7 @@
 package com.kraken.lightmeup;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +24,9 @@ public class LMUListener implements Listener {
 		Player player = e.getPlayer();
 		Location underfoot = player.getLocation().add(0, -1, 0);
 		
-		lp.checkBlock(player, underfoot);
+		if (!underfoot.getBlock().getType().equals(Material.SEA_LANTERN)) {
+			lp.checkBlock(player, underfoot);
+		}
 		
 	}
       

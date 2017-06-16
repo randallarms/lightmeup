@@ -31,7 +31,16 @@ public class LightProcessing {
 			saveBlock(player, underfoot);
 			underfoot.getBlock().setType(Material.SEA_LANTERN);
 			
+		} else {
+			saveBlock(player, underfoot);
 		}
+		
+	}
+	
+	public void lightOff(Player player) {
+		
+		restoreBlock(player);
+		litPlayers.remove(player.getUniqueId().toString());
 		
 	}
 	
@@ -59,7 +68,8 @@ public class LightProcessing {
 			player.sendMessage("Player is in litPlayers...");
 			
 			if ( !savedLoc.equals(underfoot) ) {
-				restoreBlock(player, underfoot);
+				restoreBlock(player);
+				lightUp(player);
 			}
 			
 		}
@@ -67,15 +77,17 @@ public class LightProcessing {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void restoreBlock(Player player, Location underfoot) {
+	public void restoreBlock(Player player) {
 		
 		Material type = litTypes.get( litBlocks.get(player) );
 		byte data = litData.get( litBlocks.get(player) );
+		Location savedLoc = litBlocks.get(player);
 		
-		underfoot.getBlock().setType(type, true);
+		savedLoc.getBlock().setType(type, true);
 		player.sendMessage("Type: " + type);
-		underfoot.getBlock().setData(data);
-		litBlocks.remove(player);
+		savedLoc.getBlock().setData(data);
+		litTypes.remove(savedLoc);
+		litData.remove(savedLoc);
 		
 	}
 	

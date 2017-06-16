@@ -1,6 +1,6 @@
 name: LightMeUp
 main: com.kraken.lightmeup.Main
-version: 0.1 (alpha)
+version: 1.0 (alpha)
 commands: 
      light:
         description: Lights up the ground you walk on.

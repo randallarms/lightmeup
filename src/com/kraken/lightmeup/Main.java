@@ -1,5 +1,5 @@
 // ========================================================================
-// |LIGHTMEUP v0.1
+// |LIGHTMEUP v1.0
 // | by Kraken | unpublished
 // | code inspired by various Bukkit & Spigot devs -- thank you. 
 // |
@@ -20,12 +20,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 
 public class Main extends JavaPlugin {
   	
-	public String VERSION = "0.1";
+	public String VERSION = "1.0";
 	
     private File optionsFile = new File("plugins/LightMeUp", "options.yml");
     private FileConfiguration options = YamlConfiguration.loadConfiguration(optionsFile);
@@ -33,6 +34,8 @@ public class Main extends JavaPlugin {
 	LightProcessing lp = new LightProcessing(this);
     
 	boolean opRequired = true;
+	
+	ArrayList<Player> isLit = new ArrayList<Player>();
 	
 	@Override
     public void onEnable() {
@@ -81,8 +84,14 @@ public class Main extends JavaPlugin {
         	
 			  //Command: jump
         	    case "light":
-        			  
-        			lp.lightUp(player);
+        			
+        	    	if ( isLit.contains(player) ) {
+        	    		lp.lightOff(player);
+        	    		isLit.remove(player);
+        			} else {
+        				lp.lightUp(player);
+        				isLit.add(player);
+        			}
 			        return true;
 			        
 			  //Command: opRequired
