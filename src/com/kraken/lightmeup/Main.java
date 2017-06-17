@@ -1,6 +1,6 @@
 // ========================================================================
-// |LIGHTMEUP v1.0
-// | by Kraken | unpublished
+// |LIGHTMEUP v1.1
+// | by Kraken | https://www.spigotmc.org/resources/lightmeup.42376/
 // | code inspired by various Bukkit & Spigot devs -- thank you. 
 // |
 // | Always free & open-source! If this plugin is being sold or re-branded,
@@ -26,7 +26,7 @@ import org.bukkit.ChatColor;
 
 public class Main extends JavaPlugin {
   	
-	public String VERSION = "1.0";
+	public String VERSION = "1.1";
 	
     private File optionsFile = new File("plugins/LightMeUp", "options.yml");
     private FileConfiguration options = YamlConfiguration.loadConfiguration(optionsFile);
