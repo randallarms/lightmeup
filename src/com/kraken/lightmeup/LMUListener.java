@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class LMUListener implements Listener {
@@ -17,6 +18,21 @@ public class LMUListener implements Listener {
 		this.plugin = plugin;
 		this.lp = lp;
 	}
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		
+	    Player player = e.getPlayer();
+	    String UUIDString = player.getUniqueId().toString();
+	    boolean allowed = plugin.getConfig().getBoolean(UUIDString + ".allowed");
+	    
+	    if (allowed) {
+	    	plugin.playerAllowed(UUIDString, true);
+	    } else {
+	    	plugin.playerAllowed(UUIDString, false);
+	    }
+	    
+	  }
 	
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent e) {

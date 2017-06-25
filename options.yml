@@ -1,0 +1,22 @@
+# ------------------------------------------------------
+# LIGHTMEUP Options File (options.yml)
+# 
+# Editing the settings in this file will change the way
+# LightMeUp works on your server. To reset this file to
+# its default values, simply delete your options.yml and
+# stop/restart your server.
+# ------------------------------------------------------
+#
+# LOADED MARKER | Dummy value to check against at start-up, don't change!
+loaded: true
+# 
+# ENABLED | Whether players can use the light command.
+enabled: true
+# 
+# OPREQUIRED | Whether players must have OP perms to use the light command.
+opRequired: false
+#
+# WHITELIST | Whether players must be allowed via the allowLight command to use light.
+whitelist: false
+#
+# FOR MORE INFO | https://www.spigotmc.org/threads/lightmeup.248608/
