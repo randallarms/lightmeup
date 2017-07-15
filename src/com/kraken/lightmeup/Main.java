@@ -1,5 +1,5 @@
 // ========================================================================
-// |LIGHTMEUP v1.3
+// |LIGHTMEUP v1.3.1
 // | by Kraken | https://www.spigotmc.org/resources/lightmeup.42376/
 // | code inspired by various Bukkit & Spigot devs -- thank you. 
 // |
@@ -10,6 +10,7 @@
 
 package com.kraken.lightmeup;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,20 +23,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.bukkit.ChatColor;
-
 public class Main extends JavaPlugin {
   	
-	public String VERSION = "1.3";
+	public String VERSION = "1.3.1";
 	
     private File optionsFile = new File("plugins/LightMeUp", "options.yml");
     private FileConfiguration options = YamlConfiguration.loadConfiguration(optionsFile);
 	
 	LightProcessing lp = new LightProcessing(this);
+	Messages messenger;
     
 	boolean enabled = true;
 	boolean opRequired = false;
 	boolean whitelist = false;
+	boolean silentMode = false;
 	
 	ArrayList<Player> isLit = new ArrayList<Player>();
 	ArrayList<String> isAllowed = new ArrayList<String>();
@@ -58,18 +59,16 @@ public class Main extends JavaPlugin {
 	        saveOptions();
 	        
 		}
+		
+		this.messenger = new Messages("English", silentMode, VERSION);
 
         enabled = options.getBoolean("enabled");
         opRequired = options.getBoolean("opRequired");
         
         for (String id : getConfig().getKeys(false) ) {
-        	
         	if ( getConfig().getBoolean(id + ".allowed") ) {
-        		
         		isAllowed.add(id);
-        		
         	}
-        	
         }
 		
     }
@@ -107,204 +106,245 @@ public class Main extends JavaPlugin {
         
     }
     
+    public void msg(Player player, String msg, boolean isPlayer) {
+    	messenger.makeMsg(player, msg, isPlayer);
+    }
+    
   //LMU commands
     @SuppressWarnings("deprecation")
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         
-      //Player commands
-        if ( sender instanceof Player ) {
-        	
-        	String command = cmd.getName();
-    		Player player = (Player) sender;
-    		String UUIDString = player.getUniqueId().toString();
-     	
-        	switch ( command.toLowerCase() ) {
-        	
-	        //Command: version        
-	    		case "lmu":
-	    			
-	    			if (player.isOp()) {
-      	        	  
-        	            if (args.length == 1) {
-        	            	
-        	            	switch (args[0]) {
-        	            	
-        	            		case "on":
-        	            		case "enable":
-        	            		case "true":
-        	            			options.set("enabled", true);
-        	            			enabled = true;
-        	            			saveOptions();
-        	            			
-        	            		case "off":
-        	            		case "disable":
-        	            		case "false":
-        	            			options.set("enabled", false);
-        	            			enabled = false;
-        	            			saveOptions();
-        	            			
-        	            		default:
-        	            			player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + "Try \"/lmu <on/off>\".");
-        	            			return true;
-        	            	
-        	            	}
-        	            	
-        	            } else {
-        	            	player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + "CURRENT: LightMeUp v" + VERSION + " (release)");
-        	                return true;
-        	            }
-        	            
+    	boolean isPlayer = false;
+    	
+    	Player player;
+    	String command = cmd.getName();
+    	
+	    if ( sender instanceof Player ) {
+			isPlayer = true;
+			player = (Player) sender;
+	    } else {
+	    	isPlayer = false;
+	    	player = (Player) Bukkit.getServer().getPlayerExact("Octopus__");
+	    }
+	    	
+    	switch ( command.toLowerCase() ) {
+    	
+          //Command: lmu        
+    		case "lmu":
+    			
+    			if ( ( isPlayer && !player.isOp() ) || ( args.length != 1 && args.length != 2 ) ) {
+    				
+    				msg(player, "version", isPlayer);
+	                return true;
+	                
+    			} else if ( args.length == 1 ) {
+    				
+    				switch ( args[0].toLowerCase() ) {
+	            	
+	            		case "on":
+	            		case "enable":
+	            		case "true":
+	            			options.set("enabled", true);
+	            			enabled = true;
+	            			saveOptions();
+	            			msg(player, "lmuEnabled", isPlayer);
+	            			
+	            		case "off":
+	            		case "disable":
+	            		case "false":
+	            			options.set("enabled", false);
+	            			enabled = false;
+	            			saveOptions();
+	            			msg(player, "lmuDisabled", isPlayer);
+	            			
+	            		default:
+	            			msg(player, "lmuCmdError", isPlayer);
+	            			return true;
+    				
+    				}
+    				
+    			} else if ( args.length == 2 ) {
+    				
+	    			switch ( args[0].toLowerCase() ) {
+	    				
+	    			  //Command: lmu opreq
+		        	    case "oprequired":
+		        	    case "opreq":
+		        	    		
+	        	    		switch ( args[1].toLowerCase() ) {
+	        	    		
+	        	    			case "on":
+	        	    			case "enable":
+	        	    			case "enabled":
+	        	    			case "true":
+	        	    				options.set("opRequired", true);
+	        	    				opRequired = true;
+	        	    				saveOptions();
+	        	    				msg(player, "opReqEnabled", isPlayer);
+	        	    				return true;
+	        	    				
+	        	    			case "off":
+	        	    			case "disable":
+	        	    			case "disabled":
+	        	    			case "false":
+	        	    				options.set("opRequired", false);
+	        	    				opRequired = false;
+	        	    				saveOptions();
+	        	    				msg(player, "opReqDisabled", isPlayer);
+	        	    				return true;
+	        	    				
+	        	    			default:
+	        	    				msg(player, "opReqCmdError", isPlayer);
+	        	        	    	return true;
+	        	        	    	
+	        	    		}
+	        	    		
+	  	    		  //Command: lmu whitelist
+		        	    case "whitelist":
+		        	    case "whitelisting":
+	        	    		
+		        			switch ( args[1].toLowerCase() ) {
+		    	            	
+			            		case "on":
+			            		case "enable":
+			            		case "true":
+			            			options.set("whitelist", true);
+			            			whitelist = true;
+			            			saveOptions();
+			            			msg(player, "whitelistEnabled", isPlayer);
+			            			
+			            		case "off":
+			            		case "disable":
+			            		case "false":
+			            			options.set("whitelist", false);
+			            			whitelist = false;
+			            			saveOptions();
+			            			msg(player, "whitelistDisabled", isPlayer);
+			            			
+			            		default:
+			            			msg(player, "whitelistCmdError", isPlayer);
+			            			return true;
+		    				
+		    				}
+		        	    	
 	    			}
-        	
-			  //Command: jump
-        	    case "light":
-        	    	
-                	if ( opRequired && !player.isOp() ) {
-                		player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "You do not have light privileges.");
-                        return true;
-                	} else if ( !enabled ) {
-        	    		
-        	    		player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "LMU is currently disabled.");
-        	    		return true;
-        	    		
-        	    	} else if ( !whitelist || isAllowed.contains(UUIDString) ) {
+    				
+    			}
+    	
+		  //Command: light
+    	    case "light":
+    	    	
+    	    	if ( isPlayer ) {
+    	    		
+	            	if ( opRequired && !player.isOp() ) {
+	            		msg(player, "lightCmdError", isPlayer);
+	                    return true;
+	            	} else if ( !enabled ) {
+	    	    		
+	    	    		msg(player, "lmuDisabledError", isPlayer);
+	    	    		return true;
+	    	    		
+	    	    	} else if ( !whitelist || isAllowed.contains(player.getUniqueId().toString()) ) {
 			        	
 			            if ( isLit.contains(player) ) {
 			            	
 			              lp.lightOff(player);
 			              isLit.remove(player);
-			              player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Lights off.");
+			              msg(player, "lightsOff", isPlayer);
 			              
 			            } else {
 			            	
 			              lp.lightUp(player);
 			              isLit.add(player);
-			              player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "You are lit!");
+			              msg(player, "lightsOn", isPlayer);
 			              
 			            }
 			            
 			        } else {
-			        	player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "You do not have permission to use this command.");
+			        	msg(player, "generalCmdError", isPlayer);
 			        }
-        	    	
-			        return true;
-			        
-			  //Command: allowLight
-        	    case "allowLight":
-        	    case "allowlight":
-        	    case "allowLMU":
-        	    case "allowlmu":
-			        
-        	          Player targetPlayer;
-        	          String targetUUID;
-        	          
-        	          if (player.isOp()) {
-        	        	  
-        	            if (args.length == 1) {
-        	            	
-        	            	if ( args[0].equals("*") ) {
-        	            		
-        	            		if ( options.getBoolean("whitelist") ) {
-        	            			
-        	            			whitelist = false;
-        	            			options.set("whitelist", false);
-        	            			saveOptions();
-            	            		player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Whitelisting is now disabled.");
-            	            		return true;
-            	            		
-        	            		} else {
-        	            			
-        	            			whitelist = true;
-        	            			options.set("whitelist", true);
-        	            			saveOptions();
-            	            		player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Whitelisting is now enabled.");
-            	            		return true;
-            	            		
-        	            		}
-        	            		
-        	            		
-        	            		
-        	            	}
-        	            	
-        	            	try {
-        	            		targetPlayer = getServer().getPlayerExact(args[0]);
-        	            		targetUUID = targetPlayer.getUniqueId().toString();
-        	            	} catch (NullPointerException npe1) {
-        	            		player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Player not found online.");
+	            	
+    	    	} else {
+    	    		msg(player, "playerOnlyError", isPlayer);
+    	    	}
+    	    	
+		        return true;
+		        
+		  //Command: allowLight
+    	    case "allowlight":
+    	    case "allowlmu":
+		        
+    	          Player targetPlayer;
+    	          String targetUUID;
+    	          
+    	          if (player.isOp()) {
+    	        	  
+    	            if (args.length == 1) {
+    	            	
+    	            	if ( args[0].equals("*") ) {
+    	            		
+    	            		if ( options.getBoolean("whitelist") ) {
+    	            			
+    	            			whitelist = false;
+    	            			options.set("whitelist", false);
+    	            			saveOptions();
+        	            		msg(player, "whitelistDisabled", isPlayer);
         	            		return true;
-        	            	}
-        	              
-        	            	if ( !isAllowed.contains(targetUUID) ) {
-        	            	  
-        	            		getConfig().set(targetUUID + ".allowed", true);
-        	            		isAllowed.add(targetUUID);
-        	            		player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Added " + args[0] + " to the LMU whitelist.");
-        	                
-        	            	} else {
-        	            	  
-        	            		getConfig().set(targetUUID + ".allowed", false);
-        	            		isAllowed.remove(targetUUID);
-        	            		player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Removed " + args[0] + " from the LMU whitelist.");
-        	                
-        	            	}
-        	              
-        	            	saveConfig();
-        	            	return true;
-        	              
-        	            }
-        	            
-        	            player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Try entering \"/allowLight <player>\".");
-        	            return true;
-        	            
-        	          }
-        	          
-        	          player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "You do not have permission to use this command.");
-        	          return true;
-			        
-			  //Command: opRequired
-        	    case "opRequiredLMU":
-        	    case "oprequiredlmu":
-        	    case "opReqLMU":
-        	    case "opreqlmu":
-        			  
-        	    	if ( args.length == 1 ) {
-        	    		switch ( args[0].toLowerCase() ) {
-        	    			case "on":
-        	    			case "enable":
-        	    			case "enabled":
-        	    			case "true":
-        	    				options.set("opRequired", true);
-        	    				opRequired = true;
-        	    				saveOptions();
-        	    				return true;
-        	    			case "off":
-        	    			case "disable":
-        	    			case "disabled":
-        	    			case "false":
-        	    				options.set("opRequired", false);
-        	    				opRequired = false;
-        	    				saveOptions();
-        	    				return true;
-        	    			default:
-        	    				player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Try entering \"/opReq <on/off>\".");
-        	        	    	return true;
-        	    		}
-        	    	}
-        	    	
-        	    	player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Try entering \"/opReq <on/off>\".");
-        	    	return true;
-			        
-			    default:
-			    	  
-			        player.sendMessage(ChatColor.GOLD + "[LMU]" + ChatColor.GRAY + " | " + "Command not recognized.");
-			        return true;
-			    
-	        }
-        
+        	            		
+    	            		} else {
+    	            			
+    	            			whitelist = true;
+    	            			options.set("whitelist", true);
+    	            			saveOptions();
+        	            		msg(player, "whitelistEnabled", isPlayer);
+        	            		return true;
+        	            		
+    	            		}
+    	            		
+    	            	}
+    	            	
+    	            	try {
+    	            		targetPlayer = getServer().getPlayerExact(args[0]);
+    	            		targetUUID = targetPlayer.getUniqueId().toString();
+    	            	} catch (NullPointerException npe1) {
+    	            		msg(player, "playerNotFoundError", isPlayer);
+    	            		return true;
+    	            	}
+    	              
+    	            	if ( !isAllowed.contains(targetUUID) ) {
+    	            	  
+    	            		getConfig().set(targetUUID + ".allowed", true);
+    	            		isAllowed.add(targetUUID);
+    	            		msg(player, "whitelistAdded", isPlayer);
+    	                
+    	            	} else {
+    	            	  
+    	            		getConfig().set(targetUUID + ".allowed", false);
+    	            		isAllowed.remove(targetUUID);
+    	            		msg(player, "whitelistRemoved", isPlayer);
+    	                
+    	            	}
+    	              
+    	            	saveConfig();
+    	            	return true;
+    	              
+    	            }
+    	            
+    	            msg(player, "allowLightCmdError", isPlayer);
+    	            return true;
+    	            
+    	          }
+    	          
+    	          msg(player, "generalCmdError", isPlayer);
+    	          return true;
+		        
+		    default:
+		    	  
+		        msg(player, "unrecognizedCmdError", isPlayer);
+		        return true;
+		    
         }
-        
-        return true;
-        
-    }
+	    
+	}
     
 }
