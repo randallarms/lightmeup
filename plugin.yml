@@ -1,18 +1,14 @@
 name: LightMeUp
 main: com.kraken.lightmeup.Main
-version: 1.3 (release)
+version: 1.3.1 (release)
 commands: 
+     lmu:
+        description: Main LightMeUp settings command.
+        usage: /<command> <on/off>
      light:
         description: Lights up the ground you walk on.
         usage: /<command>
-     opReqLMU:
-        description: Enable/disable requirement of OP perms to use LMU commands.
-        usage: /<command> <on/off>
-        aliases: [opRequiredLMU]
      allowLight:
         description: Toggle player permission to use the light command.
         usage: /<command> <player>
         aliases: [allowLMU]
-     lmu:
-        description: Info on the LightMeUp plugin & version number.
-        usage: /<command> <on/off>
