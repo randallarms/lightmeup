@@ -5,6 +5,7 @@ Simple custom lighting plugin for Bukkit on Minecraft 1.12, 1.11, 1.10, & 1.9!
 This plugin allows players with proper permissions to toggle a sea lantern block beneath their feet for extra lighting in dark places.
 
 commands: 
+
      lmu:
         description: Main LightMeUp settings command.
         usage: /<command> <on/off>
