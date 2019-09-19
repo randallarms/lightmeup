@@ -17,6 +17,10 @@ commands:
         usage: /<command> <player>
         aliases: [allowLMU]
         
+permissions:
+
+     Coming soon!
+        
 LightMeUp on GitHub: https://github.com/randallarms/lightmeup
 
 Do you want to help us improve this plugin? You can! Everyone welcome to contribute on GitHub by utilizing the Flow to branch their own version, make changes (commits), and submit their changes as a "pull request" to be considered for merging with the master file.
